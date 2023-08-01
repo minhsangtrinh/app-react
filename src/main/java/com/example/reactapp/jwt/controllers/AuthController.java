@@ -11,7 +11,7 @@ import com.example.reactapp.jwt.repository.RoleRepository;
 import com.example.reactapp.jwt.repository.UserRepository;
 import com.example.reactapp.jwt.security.jwt.JwtUtils;
 import com.example.reactapp.jwt.security.services.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,21 +33,17 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-  @Autowired
-  AuthenticationManager authenticationManager;
+  private final AuthenticationManager authenticationManager;
 
-  @Autowired
-  UserRepository userRepository;
+  private final UserRepository userRepository;
 
-  @Autowired
-  RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-  @Autowired
-  PasswordEncoder encoder;
+  private final PasswordEncoder encoder;
 
-  @Autowired
-  JwtUtils jwtUtils;
+  private final JwtUtils jwtUtils;
 
   @PostMapping("/signing")
   public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -63,10 +59,10 @@ public class AuthController {
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok(new JwtResponse(jwt,
-                         userDetails.getId(), 
-                         userDetails.getUsername(), 
-                         userDetails.getEmail(), 
+    return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",
+                         userDetails.getId(),
+                         userDetails.getUsername(),
+                         userDetails.getEmail(),
                          roles));
   }
 
@@ -85,9 +81,10 @@ public class AuthController {
     }
 
     // Create new user's account
-    User user = new User(signUpRequest.getUsername(),
-               signUpRequest.getEmail(),
-               encoder.encode(signUpRequest.getPassword()));
+    User user = new User();
+    user.setUsername(signUpRequest.getUsername());
+    user.setEmail(signUpRequest.getEmail());
+    user.setPassword(encoder.encode(signUpRequest.getPassword()));
 
     Set<String> strRoles = signUpRequest.getRole();
     Set<Role> roles = new HashSet<>();
