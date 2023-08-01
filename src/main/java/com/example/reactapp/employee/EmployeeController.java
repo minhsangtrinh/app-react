@@ -1,5 +1,6 @@
 package com.example.reactapp.employee;
 
+import com.example.reactapp.config.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/employee")
-public class EmployeeController {
+public class EmployeeController extends JwtAuthenticationEntryPoint {
     private final EmployeeService employeeService;
 
     @PostMapping()
